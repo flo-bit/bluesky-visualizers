@@ -70,7 +70,7 @@
 				// check if we're up to date
 
 				const postTime = json.time_us;
-				if (Date.now() > lastUpdateTime + 5000 && posts > 1000) {
+				if (Date.now() > lastUpdateTime + 5000 && posts > 100) {
 					lastUpdateTime = Date.now();
 
 					// update last update time
