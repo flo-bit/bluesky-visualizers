@@ -139,7 +139,7 @@ import ParticleSystem from './particles';
 	});
 
 	const url =
-		'wss://jetstream2.us-east.bsky.network/subscribe?wantedCollections=app.bsky.feed.post&wantedCollections=app.bsky.feed.like&wantedCollections=app.bsky.graph.follow';
+		'wss://jetstream2.us-east.bsky.network/subscribe?wantedCollections=app.bsky.feed.post&wantedCollections=app.bsky.feed.like&wantedCollections=app.bsky.graph.follow&wantedCollections=app.bsky.actor.profile';
 
 	// WebSocket logic
 	const ws = new WebSocket(url);
@@ -149,24 +149,26 @@ import ParticleSystem from './particles';
 
 	ws.onmessage = (event) => {
 		const json = JSON.parse(event.data);
-		if (json.kind === 'account') console.log(json);
 
-		if (json.kind === 'commit') {
-			if (json.commit.collection === 'app.bsky.feed.post' && json.commit.operation === 'create') {
-				spawnParticle('post');
-			} else if (
-				json.commit.collection === 'app.bsky.feed.like' &&
-				json.commit.operation === 'create'
-			) {
-				spawnParticle('heart');
-			} else if (
-				json.commit.collection === 'app.bsky.graph.follow' &&
-				json.commit.operation === 'create'
-			) {
-				spawnParticle('follow');
-			}
-		} else if (json.kind === 'account' && json.account.active) {
-			spawnParticle('user');
+		if (json.kind !== 'commit') return;
+
+		if (json.commit.collection === 'app.bsky.feed.post' && json.commit.operation === 'create') {
+			spawnParticle('post');
+		} else if (
+			json.commit.collection === 'app.bsky.feed.like' &&
+			json.commit.operation === 'create'
+		) {
+			spawnParticle('heart');
+		} else if (
+			json.commit.collection === 'app.bsky.graph.follow' &&
+			json.commit.operation === 'create'
+		) {
+			spawnParticle('follow');
+		} else if (
+			json.commit.collection === 'app.bsky.actor.profile' &&
+			json.commit.operation === 'create'
+		) {
+			spawnParticle('user')
 		}
 	};
 
