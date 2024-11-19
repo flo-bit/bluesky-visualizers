@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { relativeTime } from 'svelte-relative-time';
 
 	import { gsap } from 'gsap';
@@ -20,13 +20,17 @@
 
 	let startTime = 0;
 
-	onMount(() => {
-		function secondsToMicroseconds(seconds: number) {
+	let language = 'en';
+
+	function secondsToMicroseconds(seconds: number) {
 			return Math.floor(seconds * 1000000);
 		}
 
+	let ws: WebSocket;
+
+	function connect() {
+		
 		startTime = Date.now() * 1000 - secondsToMicroseconds(60 * 60);
-		console.log(startTime);
 
 		// WebSocket URL from BlueSky
 		const url =
@@ -35,64 +39,68 @@
 
 		// WebSocket logic
 		const ws = new WebSocket(url);
-		ws.onopen = () => {
-			console.log('Connected to BlueSky WebSocket');
-		};
 
-		ws.onmessage = (event) => {
-			const json = JSON.parse(event.data);
+		ws.onmessage = onEvent;
+	}
 
-			// console.log(json);
-			if (
-				json.kind === 'commit' &&
-				json.commit.collection === 'app.bsky.feed.post' &&
-				json.commit.operation === 'create' &&
-				json.commit.record.text &&
-				(!json.commit.record.langs || json.commit.record.langs.includes('en'))
-			) {
-				// get text of post
-				const text: string = json.commit.record.text;
-
-				// check if text contains #
-				if (!text.includes('#')) {
-					// console.log(json);
-					return;
-				}
-
-				// find all hashtags
-				const hashtags = text.match(/#(\w+)/g);
-
-				hashtags?.forEach((hashtag) => {
-					hashtag = hashtag.toLowerCase();
-					wordCounts.set(hashtag, (wordCounts.get(hashtag) || 0) + 1);
-				});
-
-				// check if we're up to date
-
-				const postTime = json.time_us;
-				if (Date.now() > lastUpdateTime + 5000 && posts > 100) {
-					lastUpdateTime = Date.now();
-
-					// update last update time
-					lastUpdatePostTime = postTime;
-
-					// get most popular hashtags
-					update();
-				}
-
-				posts++;
-			}
-		};
-
-		return () => {
-			ws.close();
-		};
+	onMount(() => {
+		connect();
 	});
+
+	onDestroy(() => {
+		if(ws) ws.close();
+	});
+
+	function onEvent(event: MessageEvent) {
+		const json = JSON.parse(event.data);
+
+		// console.log(json);
+		if (
+			json.kind === 'commit' &&
+			json.commit.collection === 'app.bsky.feed.post' &&
+			json.commit.operation === 'create' &&
+			json.commit.record.text &&
+			(json.commit.record.langs?.includes(language) || (language === 'en' && !json.commit.record.langs))
+		) {
+			// get text of post
+			const text: string = json.commit.record.text;
+
+			// check if text contains #
+			if (!text.includes('#')) {
+				// console.log(json);
+				return;
+			}
+
+			// find all hashtags
+			const hashtags = text.match(/#(\w+)/g);
+
+			hashtags?.forEach((hashtag) => {
+				hashtag = hashtag.toLowerCase();
+				wordCounts.set(hashtag, (wordCounts.get(hashtag) || 0) + 1);
+			});
+
+			// check if we're up to date
+
+			const postTime = json.time_us;
+			if (Date.now() > lastUpdateTime + 5000 && posts > 100) {
+				lastUpdateTime = Date.now();
+
+				// update last update time
+				lastUpdatePostTime = postTime;
+
+				// get most popular hashtags
+				update();
+			}
+
+			posts++;
+		}
+	}
 
 	async function update() {
 		const state = Flip.getState('.item', {
 			props: 'opacity,y'
 		});
+
 
 		mostPopularHashtags = getMostPopularHashtags(15);
 
@@ -117,10 +125,62 @@
 			.slice(0, num);
 		return mostPopular;
 	}
+
+	import Check from 'lucide-svelte/icons/check';
+	import ChevronsUpDown from 'lucide-svelte/icons/chevrons-up-down';
+	import * as Command from '$lib/components/ui/command/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
+	import { Button } from '$lib/components/ui/button/index.js';
+	import { cn } from '$lib/utils.js';
+
+	const languages = [
+		{ value: 'en', label: 'English' },
+		{ value: 'zh', label: 'Chinese (Mandarin)' },
+		{ value: 'es', label: 'Spanish' },
+		{ value: 'hi', label: 'Hindi' },
+		{ value: 'ar', label: 'Arabic' },
+		{ value: 'bn', label: 'Bengali' },
+		{ value: 'fr', label: 'French' },
+		{ value: 'ru', label: 'Russian' },
+		{ value: 'pt', label: 'Portuguese' },
+		{ value: 'ur', label: 'Urdu' },
+		{ value: 'id', label: 'Indonesian' },
+		{ value: 'de', label: 'German' },
+		{ value: 'ja', label: 'Japanese' },
+		{ value: 'sw', label: 'Swahili' },
+		{ value: 'mr', label: 'Marathi' },
+		{ value: 'te', label: 'Telugu' },
+		{ value: 'ta', label: 'Tamil' },
+		{ value: 'tr', label: 'Turkish' },
+		{ value: 'ko', label: 'Korean' },
+		{ value: 'vi', label: 'Vietnamese' }
+	];
+
+	let open = false;
+	let value = '';
+
+	$: selectedValue = languages.find((f) => f.value === value)?.label ?? 'Select a language...';
+
+	$: if (selectedValue !== 'Select a language...') {
+		language = value;
+
+		wordCounts = new Map<string, number>();
+
+		update();
+	}
+
+	// We want to refocus the trigger button when the user selects
+	// an item from the list so users can continue navigating the
+	// rest of the form with the keyboard.
+	function closeAndFocusTrigger(triggerId: string) {
+		open = false;
+		tick().then(() => {
+			document.getElementById(triggerId)?.focus();
+		});
+	}
 </script>
-<div
-	class="absolute left-0 top-0 flex w-full items-center justify-between px-4 py-2"
->
+
+<div class="absolute left-0 top-0 flex w-full items-center justify-between px-4 py-2">
 	<Credit name="trending hashtags" />
 </div>
 
@@ -146,6 +206,42 @@
 			analysing posts...
 		{/if}
 	</div>
+
+	<Popover.Root bind:open let:ids>
+		<Popover.Trigger asChild let:builder>
+			<Button
+				builders={[builder]}
+				variant="outline"
+				role="combobox"
+				aria-expanded={open}
+				class="mt-2 w-[200px] justify-between border-gray-800 bg-gray-900 hover:bg-gray-800 hover:text-cyan-400 hover:border-gray-700"
+			>
+				{selectedValue}
+				<ChevronsUpDown class="ml-2 h-4 w-4 shrink-0 opacity-50" />
+			</Button>
+		</Popover.Trigger>
+		<Popover.Content class="max-h-[60vh] w-[200px] overflow-y-auto border-gray-800 p-0">
+			<Command.Root class="bg-gray-900">
+				<Command.Input placeholder="Select language..." class="text-cyan-400 placeholder:" />
+				<Command.Empty class="text-gray-400">No framework found.</Command.Empty>
+				<Command.Group>
+					{#each languages as language}
+						<Command.Item
+							value={language.label}
+							onSelect={(currentValue) => {
+								value = currentValue;
+								closeAndFocusTrigger(ids.trigger);
+							}}
+							class="text-gray-200 aria-selected:bg-gray-800 aria-selected:text-cyan-400"
+						>
+							<Check class={cn('mr-2 h-4 w-4', value !== language.value && 'text-transparent')} />
+							{language.label}
+						</Command.Item>
+					{/each}
+				</Command.Group>
+			</Command.Root>
+		</Popover.Content>
+	</Popover.Root>
 
 	<div class="mt-8">
 		{#if mostPopularHashtags.length === 0}
