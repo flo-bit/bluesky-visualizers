@@ -48,7 +48,8 @@
 				json.commit.collection === 'app.bsky.feed.post' &&
 				json.commit.operation === 'create' &&
 				json.commit.record.text &&
-				(!json.commit.record.langs || json.commit.record.langs.includes('en'))
+				(json.commit.record.langs?.includes(languageCode) ||
+					(!json.commit.record.langs && languageCode === 'en'))
 			) {
 				// get text of post
 				const text: string = json.commit.record.text;
@@ -117,10 +118,37 @@
 			.slice(0, num);
 		return mostPopular;
 	}
+
+	const languages = [
+		{ value: 'en', label: 'English' },
+		{ value: 'zh', label: 'Mandarin Chinese' },
+		{ value: 'hi', label: 'Hindi' },
+		{ value: 'es', label: 'Spanish' },
+		{ value: 'ar', label: 'Arabic' },
+		{ value: 'bn', label: 'Bengali' },
+		{ value: 'fr', label: 'French' },
+		{ value: 'ru', label: 'Russian' },
+		{ value: 'pt', label: 'Portuguese' },
+		{ value: 'id', label: 'Indonesian' },
+		{ value: 'ur', label: 'Urdu' },
+		{ value: 'ja', label: 'Japanese' },
+		{ value: 'de', label: 'German' },
+		{ value: 'ko', label: 'Korean' },
+		{ value: 'vi', label: 'Vietnamese' },
+		{ value: 'tr', label: 'Turkish' },
+		{ value: 'it', label: 'Italian' },
+		{ value: 'pl', label: 'Polish' },
+		{ value: 'uk', label: 'Ukrainian' },
+		{ value: 'nl', label: 'Dutch' }
+	];
+
+	let showLanguageSelector = false;
+
+	let languageCode = 'en';
+	let language = 'English';
 </script>
-<div
-	class="absolute left-0 top-0 flex w-full items-center justify-between px-4 py-2"
->
+
+<div class="absolute left-0 top-0 flex w-full items-center justify-between px-4 py-2">
 	<Credit name="trending hashtags" />
 </div>
 
@@ -146,6 +174,38 @@
 			analysing posts...
 		{/if}
 	</div>
+
+	{#if !showLanguageSelector}
+		<button
+			class="mt-2 text-sm font-semibold text-gray-100 hover:text-cyan-400"
+			on:click={() => (showLanguageSelector = true)}
+		>
+			{language} (change language)
+		</button>
+	{:else}
+		<div class="mt-2">
+			<label for="location" class="block text-sm/6 font-medium text-gray-50">language</label>
+			<select
+				on:change={(e) => {
+					showLanguageSelector = false;
+					languageCode = (e.target as HTMLSelectElement).value;
+					language = languages.find((l) => l.value === languageCode)?.label || 'English';
+
+					wordCounts.clear();
+					update();
+				}}
+				id="location"
+				name="location"
+				class="mt-2 block w-full rounded-md border-0 bg-gray-900 py-1.5 pl-3 pr-10 text-gray-50 ring-1 ring-inset ring-gray-800 focus:ring-2 focus:ring-cyan-600 sm:text-sm/6"
+			>
+				{#each languages as language}
+					<option selected={languageCode === language.value} value={language.value}
+						>{language.label}</option
+					>
+				{/each}
+			</select>
+		</div>
+	{/if}
 
 	<div class="mt-8">
 		{#if mostPopularHashtags.length === 0}
