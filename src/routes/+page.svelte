@@ -11,7 +11,7 @@
 		</div>
 
 		<div class="mt-6 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:grid-rows-2 sm:gap-x-6 lg:gap-8">
-			<div class="flex flex-col gap-8">
+			<div class="flex flex-col gap-8 sm:row-span-2">
 				<div
 					class="group relative aspect-[2/1] overflow-hidden rounded-lg border border-gray-900 sm:row-span-2 sm:aspect-square"
 				>
@@ -60,7 +60,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="flex flex-col gap-8">
+			<div class="flex flex-col gap-8 sm:row-span-2">
 				<div
 					class="group relative aspect-[2/1] overflow-hidden rounded-lg border border-gray-900 sm:aspect-[4/3]"
 				>
@@ -106,6 +106,27 @@
 							</h3>
 						</div>
 					</div>
+				</div>
+			</div>
+		</div>
+		<div class="group relative mt-6 aspect-[2/1] overflow-hidden rounded-lg border border-gray-900">
+			<img
+				src="/bluesky-visualizers/planet.webp"
+				alt=""
+				class="absolute size-full object-cover transition-opacity duration-75 group-hover:opacity-75"
+			/>
+			<div
+				aria-hidden="true"
+				class="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-80"
+			></div>
+			<div class="absolute inset-0 flex items-end p-6">
+				<div>
+					<h3 class="font-semibold text-white">
+						<a href="/bluesky-visualizers/planet">
+							<span class="absolute inset-0"></span>
+							Butterfly Planet
+						</a>
+					</h3>
 				</div>
 			</div>
 		</div>

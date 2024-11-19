@@ -36,6 +36,9 @@
 		"@sveltejs/adapter-static": "^3.0.6",
 		"@tailwindcss/forms": "^0.5.9",
 		"@tailwindcss/typography": "^0.5.15",
+		"@threlte/core": "^8.0.0-next.30",
+		"@threlte/extras": "^9.0.0-next.39",
+		"@types/three": "^0.170.0",
 		"d3-cloud": "^1.2.7",
 		"d3-scale": "^4.0.2",
 		"d3-scale-chromatic": "^3.1.0",
@@ -43,6 +46,9 @@
 		"d3-transition": "^3.0.1",
 		"gsap": "^3.12.5",
 		"pixi.js": "^8.5.2",
-		"svelte-relative-time": "^0.0.6"
+		"postprocessing": "^6.36.4",
+		"svelte-relative-time": "^0.0.6",
+		"three": "^0.170.0",
+		"uber-noise": "^0.2.2"
 	}
 }
