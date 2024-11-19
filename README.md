@@ -4,7 +4,7 @@ collection of visualizations for bluesky, using the bluesky api, tailwind, svelt
 
 [trending hashtags](https://flo-bit.dev/bluesky-visualizers/trending)
 
-![bluesky-trending](https://github.com/user-attachments/assets/b980de13-8168-4f5e-b00e-d6331fec3127)
+<img width="400" alt="trending" src="https://github.com/user-attachments/assets/b980de13-8168-4f5e-b00e-d6331fec3127">
 
 [wordcloud](https://flo-bit.dev/bluesky-visualizers/wordcloud)
 
