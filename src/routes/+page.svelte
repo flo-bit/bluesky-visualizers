@@ -1,7 +1,5 @@
 <script>
-
 	import Credit from "$lib/Credit.svelte";
-
 </script>
 <Credit showAll={false} />
 
