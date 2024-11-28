@@ -1,4 +1,6 @@
 <script lang="ts">
+	// powered by https://github.com/vasturiano/3d-force-graph
+
 	import { AtpBaseClient } from '@atproto/api';
 	import type { ProfileViewDetailed } from '@atproto/api/dist/client/types/app/bsky/actor/defs';
 	import Credit from '$lib/Credit.svelte';
@@ -85,7 +87,7 @@
 
 		const nodes = Array.from(baseFollowsSet)
 			.filter((h) => {
-				if (!userInfo.has(h) || (edgeCount.get(h) ?? 0) < 3) {
+				if (!userInfo.has(h) || (edgeCount.get(h) ?? 0) < 1) {
 					return false;
 				}
 				return true;
@@ -189,4 +191,8 @@
 		class="inline-flex w-full justify-center rounded-md bg-accent-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accent-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-600 disabled:opacity-50"
 		onclick={loadUser}>resolve</button
 	>
+
+	{#if loading}
+		<div class="text-sm font-semibold">loading... please wait</div>
+	{/if}
 </div>
