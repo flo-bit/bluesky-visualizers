@@ -32,7 +32,6 @@
 			{ actor: did }
 		);
 
-		console.log(userData);
 		const baseFollows = await getFollows(did, limit);
 
 		const baseFollowsSet = new Set(baseFollows.map((f) => f.handle));
@@ -116,7 +115,6 @@
 	async function getFollows(did: string, limit: number = 100) {
 		const agent = new AtpBaseClient({ service: 'https://api.bsky.app' });
 
-		console.log(did, limit);
 		let allFollows: any[] = [];
 		let cursor: string | undefined = undefined;
 		// get all follows of actor
@@ -138,46 +136,21 @@
 		const module = await import('3d-force-graph');
 		const ForceGraph3D = module.default;
 
-		const THREE = await import('three');
-
 		const CSS2DRenderer = await import('three/examples/jsm/renderers/CSS2DRenderer.js');
-		console.log(CSS2DRenderer);
-
-		const alphaMap = new THREE.TextureLoader().load('/bluesky-visualizers/alpha.png');
 
 		const distance = 300;
 		const Graph = ForceGraph3D({
 			// @ts-ignore
 			extraRenderers: [new CSS2DRenderer.CSS2DRenderer()]
 		})(element)
-			// .nodeThreeObject(({ imageURL }) => {
-			// 	if (!imageURL) {
-			// 		return null;
-			// 	}
-			// 	const encodeImageUrl = encodeURIComponent(imageURL);
-			// 	const imgTexture = new THREE.TextureLoader().load(
-			// 		`/bluesky-visualizers/api/getAvatarImage?img=${encodeImageUrl}`
-			// 	);
-			// 	imgTexture.colorSpace = THREE.SRGBColorSpace;
-			// 	const material = new THREE.SpriteMaterial({
-			// 		map: imgTexture,
-			// 		alphaMap: alphaMap,
-			// 		transparent: true,
-			// 		alphaTest: 0.5
-			// 	});
-			// 	const sprite = new THREE.Sprite(material);
-			// 	sprite.scale.set(12, 12, 12);
-			// 	return sprite;
-			// })
 			.nodeThreeObject((node) => {
-				// wait 1-3 seconds
 				const nodeEl = document.createElement('img');
 				// @ts-ignore
 				nodeEl.src = node.imageURL;
 				nodeEl.style.width = '30px';
 				nodeEl.style.height = '30px';
 
-				nodeEl.style.borderRadius = '20px';
+				nodeEl.style.borderRadius = '100px';
 				nodeEl.style.objectFit = 'cover';
 				nodeEl.className = 'node-label';
 				return new CSS2DRenderer.CSS2DObject(nodeEl);
@@ -193,22 +166,12 @@
 		window.addEventListener('resize', () => {
 			Graph.width(window.innerWidth).height(window.innerHeight);
 		});
-
-		// // camera orbit
-		// let angle = 0;
-		// setInterval(() => {
-		// 	Graph.cameraPosition({
-		// 		x: distance * Math.sin(angle),
-		// 		z: distance * Math.cos(angle)
-		// 	});
-		// 	angle += Math.PI / 300;
-		// }, 10);
 	}
 </script>
 
 <Credit />
 
-<div bind:this={element}></div>
+<div bind:this={element} class="w-full h-full"></div>
 
 <div class="mx-auto flex max-w-2xl flex-col gap-4 px-4 pt-16 text-white">
 
@@ -227,10 +190,3 @@
 		onclick={loadUser}>resolve</button
 	>
 </div>
-
-<style>
-	div {
-		width: 100%;
-		height: 100%;
-	}
-</style>
