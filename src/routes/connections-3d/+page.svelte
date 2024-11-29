@@ -60,13 +60,6 @@
 				edges.push({ source: userData.handle, target: follow.handle });
 
 				userInfo.set(follow.handle, follow);
-
-				// load image after 1-3 seconds
-				setTimeout(() => {
-					const image = new Image();
-					image.src = follow.avatar?.replace('avatar', 'avatar_thumbnail');
-
-				}, Math.random() * 8000 + 1000);
 			})();
 			promises.push(promise);
 		}
@@ -140,6 +133,21 @@
 
 		const CSS2DRenderer = await import('three/examples/jsm/renderers/CSS2DRenderer.js');
 
+		const THREE = await import('three');
+
+		console.log(data.nodes.length);
+
+		let currentDataSet = new Set();
+
+		const currentData = {
+			nodes: [data.nodes[0]],
+			links: []
+		};
+
+		currentDataSet.add(data.nodes[0].id);
+
+		let currentIndex = 1;
+
 		const distance = 300;
 		const Graph = ForceGraph3D({
 			// @ts-ignore
@@ -155,15 +163,64 @@
 				nodeEl.style.borderRadius = '100px';
 				nodeEl.style.objectFit = 'cover';
 				nodeEl.className = 'node-label';
-				return new CSS2DRenderer.CSS2DObject(nodeEl);
+				nodeEl.style.border = '1px solid black';
+				let obj = new CSS2DRenderer.CSS2DObject(nodeEl);
+
+				// add a low poly sphere to the node
+				const sphere = new THREE.Mesh(
+					new THREE.SphereGeometry(4, 32, 32),
+					new THREE.MeshBasicMaterial({visible: false})
+				);
+				sphere.add(obj);
+
+				return sphere;
 			})
-			.graphData(data)
+			.enableNodeDrag(false)
+			.graphData(currentData)
 			.nodeLabel((node) => `${node.id}`)
 			.onNodeClick((node) => {
 				window.open(`https://bsky.app/profile/${node.id}`, '_blank');
 			})
-			.cameraPosition({ z: distance })
+			.cameraPosition({ z: distance });
 
+		let interval = setInterval(() => {
+			if (currentIndex >= data.nodes.length) {
+				clearInterval(interval);
+				return;
+			}
+
+			currentData.nodes.push(data.nodes[currentIndex]);
+			currentDataSet.add(data.nodes[currentIndex].id);
+
+			currentData.links.push(
+				...data.links.filter(
+					(link) => currentDataSet.has(link.source) && currentDataSet.has(link.target)
+				)
+			);
+
+			Graph.graphData(currentData);
+			currentIndex++;
+		}, 10);
+		// update function every frame
+		// .onEngineTick(() => {
+		// 	console.log('tick');
+		// 	// make all the nodes face the camera
+		// 	let camera = Graph.cameraPosition();
+		// 	Graph.scene().traverse((child) => {
+		// 		if (child instanceof CSS2DRenderer.CSS2DObject) {
+		// 			// Create a Vec3 that holds the label's position
+		// 			var start = new THREE.Vector3();
+		// 			start.copy(child.position);
+
+		// 			// Create a var that holds the distance to the camera
+		// 			var dist = start.distanceTo(camera);
+
+		// 			// Apply falloff, then turn that into the label's scale
+		// 			var size = 1 / dist;
+		// 			child.scale.set(size, size, size);
+		// 		}
+		// 	});
+		// })
 
 		window.addEventListener('resize', () => {
 			Graph.width(window.innerWidth).height(window.innerHeight);
@@ -173,7 +230,7 @@
 
 <Credit />
 
-<div bind:this={element} class="w-full h-full"></div>
+<div bind:this={element} class="h-full w-full"></div>
 
 <div class="mx-auto flex max-w-2xl flex-col gap-4 px-4 pt-16 text-white">
 	<p class="my-4 text-sm font-semibold">
