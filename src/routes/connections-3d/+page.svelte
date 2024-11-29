@@ -244,7 +244,7 @@
 			id="handle-input"
 			bind:value={handle}
 			class="block w-full rounded-md border-0 bg-base-900 py-1.5 text-base-900 shadow-sm ring-1 ring-inset ring-base-300 placeholder:text-base-400 focus:ring-2 focus:ring-inset focus:ring-accent-600 dark:text-base-100 dark:ring-base-700 dark:placeholder:text-base-600 dark:focus:ring-accent-500 sm:text-sm/6"
-			placeholder="yourname.blsky.social"
+			placeholder="yourname.bsky.social"
 			type="text"
 			required
 		/>
