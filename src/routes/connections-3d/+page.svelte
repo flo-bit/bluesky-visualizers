@@ -176,23 +176,32 @@
 <div bind:this={element} class="w-full h-full"></div>
 
 <div class="mx-auto flex max-w-2xl flex-col gap-4 px-4 pt-16 text-white">
+	<p class="my-4 text-sm font-semibold">
+		See the connections between the last 150 people you followed (if they followed each other as
+		part of their last 150 follows)
+	</p>
 
-	<div class="text-sm font-semibold my-4">see the connections between the last 150 people you followed (if they followed each other as part of their last 150 follows)</div>
-	<div class="text-lg font-semibold">enter a handle:</div>
+	<form method="POST" on:submit|preventDefault={loadUser}>
+		<label for="handle-input" class="mb-2 block text-lg font-semibold">Enter a handle:</label>
+		<input
+			id="handle-input"
+			bind:value={handle}
+			class="block w-full rounded-md border-0 bg-base-900 py-1.5 text-base-900 shadow-sm ring-1 ring-inset ring-base-300 placeholder:text-base-400 focus:ring-2 focus:ring-inset focus:ring-accent-600 dark:text-base-100 dark:ring-base-700 dark:placeholder:text-base-600 dark:focus:ring-accent-500 sm:text-sm/6"
+			placeholder="yourname.blsky.social"
+			type="text"
+			required
+		/>
 
-	<input
-		bind:value={handle}
-		class="block w-full rounded-md border-0 bg-base-900 py-1.5 text-base-900 shadow-sm ring-1 ring-inset ring-base-300 placeholder:text-base-400 focus:ring-2 focus:ring-inset focus:ring-accent-600 dark:focus:ring-accent-500 sm:text-sm/6 dark:text-base-100 dark:ring-base-700 dark:placeholder:text-base-600"
-		placeholder="yourname.blsky.social"
-	/>
-
-	<button
-		disabled={loading}
-		class="inline-flex w-full justify-center rounded-md bg-accent-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accent-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-600 disabled:opacity-50"
-		onclick={loadUser}>resolve</button
-	>
+		<button
+			type="submit"
+			disabled={loading}
+			class="mt-4 inline-flex w-full justify-center rounded-md bg-accent-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-accent-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-600 disabled:opacity-50"
+		>
+			Resolve
+		</button>
+	</form>
 
 	{#if loading}
-		<div class="text-sm font-semibold">loading... please wait</div>
+		<p class="text-sm font-semibold" aria-live="polite">Loading... please wait</p>
 	{/if}
 </div>
