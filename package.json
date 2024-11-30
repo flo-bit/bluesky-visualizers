@@ -55,5 +55,6 @@
 		"svelte-relative-time": "^0.0.6",
 		"three": "^0.170.0",
 		"uber-noise": "^0.2.2"
-	}
+	},
+	"license": "MIT"
 }
