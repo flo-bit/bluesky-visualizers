@@ -15,7 +15,7 @@
 	async function loadUser() {
 		loading = true;
 		const did = await resolveHandle(handle);
-		const data = await loadData(did, 150);
+		const data = await loadData(did, 250);
 		makeGraph(data);
 		loading = false;
 	}
