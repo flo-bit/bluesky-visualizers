@@ -124,7 +124,7 @@
 				{/each}
 		</div>
 		<div class="text-sm text-gray-400 text-end mt-4 max-w-lg ml-auto">
-			analized {posts} posts,
+			analyzed {posts} posts,
 			 using the <a class="text-cyan-400 hover:text-cyan-500 font-semibold" href="https://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm" target="_blank">
 			NRC Word-Emotion Association Lexicon</a>, this is not any kind of scientific analysis, just a fun experiment.
 		</div>
